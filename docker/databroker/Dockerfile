@@ -38,6 +38,7 @@ RUN echo '{  \n\
 RUN wget https://raw.githubusercontent.com/eProsima/databroker/main/databroker.repos && \
     mkdir src && \
     vcs import src < databroker.repos && \
+    cd src/databroker && git checkout feature/local-ds && cd ../.. && \
     colcon build --event-handlers=console_direct+
 
 CMD [ "./build/databroker/databroker", "--configuration-file", "resources/DATABROKER_CONFIGURATION.yaml" ]
