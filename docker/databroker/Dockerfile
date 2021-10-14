@@ -39,7 +39,7 @@ RUN wget https://raw.githubusercontent.com/eProsima/databroker/main/databroker.r
     mkdir src && \
     vcs import src < databroker.repos && \
     cd src/fastrtps && git checkout hotfix/tcp-close-stuck && cd ../.. && \
-    cd src/databroker && git checkout feature/inf-lease-duration && cd ../.. && \
+    cd src/databroker && git checkout databroker-poc && cd ../.. && \
     colcon build --event-handlers=console_direct+
 
 CMD [ "./build/databroker/databroker", "--configuration-file", "resources/DATABROKER_CONFIGURATION.yaml" ]
