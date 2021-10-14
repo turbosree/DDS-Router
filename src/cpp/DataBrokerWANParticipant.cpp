@@ -99,7 +99,7 @@ eprosima::fastdds::dds::DomainParticipantQos DataBrokerWANParticipant::participa
             for (auto address : configuration_.listening_addresses)
             {
                 std::shared_ptr<eprosima::fastdds::rtps::TCPv4TransportDescriptor> descriptor =
-                    std::make_shared<eprosima::fastdds::rtps::TCPv4TransportDescriptor>();
+                        std::make_shared<eprosima::fastdds::rtps::TCPv4TransportDescriptor>();
 
                 descriptor->add_listener_port(address.port);
                 descriptor->set_WAN_address(address.ip);
@@ -163,6 +163,8 @@ eprosima::fastdds::dds::DomainParticipantQos DataBrokerWANParticipant::participa
     // Set this participant as a SERVER
     pqos.wire_protocol().builtin.discovery_config.discoveryProtocol =
             fastrtps::rtps::DiscoveryProtocol::SERVER;
+
+    pqos.wire_protocol().builtin.discovery_config.leaseDuration = eprosima::fastrtps::c_TimeInfinite;
 
     return pqos;
 }
