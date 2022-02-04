@@ -28,7 +28,7 @@ namespace yaml {
 enum YamlReaderVersion
 {
     V_0_1,
-    V_0_2,
+    LATEST,
 };
 
 using TagType = std::string;
@@ -41,17 +41,17 @@ class YamlReader
 {
 public:
 
-    template <typename T, YamlReaderVersion V = V_0_2>
+    template <typename T, YamlReaderVersion V = LATEST>
     static T get(
             const Yaml& yml,
             const TagType& tag);
 
-    template <typename T, YamlReaderVersion V = V_0_2>
+    template <typename T, YamlReaderVersion V = LATEST>
     static std::list<T> get_list(
             const Yaml& yml,
             const TagType& tag);
 
-    template <typename T, YamlReaderVersion V = V_0_2>
+    template <typename T, YamlReaderVersion V = LATEST>
     static std::set<T> get_set(
             const Yaml& yml,
             const TagType& tag);
@@ -66,34 +66,40 @@ protected:
             const Yaml& yml,
             const TagType& tag);
 
-    template <typename T, YamlReaderVersion V = V_0_2>
+    template <typename T, YamlReaderVersion V = LATEST>
     static T get(
             const Yaml& yml);
 
-    template <typename T, YamlReaderVersion V = V_0_2>
+    template <typename T, YamlReaderVersion V = LATEST>
     static T get_scalar(
             const Yaml& yml);
 
-    template <typename T, YamlReaderVersion V = V_0_2>
+    template <typename T, YamlReaderVersion V = LATEST>
     static T get_scalar(
             const Yaml& yml,
             const TagType& tag);
 
-    template <typename T, YamlReaderVersion V = V_0_2>
+    template <typename T, YamlReaderVersion V = LATEST>
     static std::list<T> get_list(
             const Yaml& yml);
 
-    template <typename T, YamlReaderVersion V = V_0_2>
+    template <typename T, YamlReaderVersion V = LATEST>
     static T get_enumeration(
             const Yaml& yml,
             const std::map<TagType, T>& enum_values);
 
-    template <typename T, YamlReaderVersion V = V_0_2>
+    template <typename T, YamlReaderVersion V = LATEST>
     static T get_enumeration(
             const Yaml& yml,
             const TagType& tag,
             const std::map<TagType, T>& enum_values);
 };
+
+//! \c YamlReaderVersion to stream serializator
+std::ostream& operator <<(
+        std::ostream& os,
+        const YamlReaderVersion& v);
+
 
 } /* namespace yaml */
 } /* namespace ddsrouter */
@@ -101,5 +107,6 @@ protected:
 
 // Include implementation template file
 #include <ddsrouter/yaml/implementations/YamlReader.ipp>
+#include <ddsrouter/yaml/implementations/YamlReaderParticipant.ipp>
 
 #endif /* _DDSROUTER_YAML_YAMLREADER_HPP_ */

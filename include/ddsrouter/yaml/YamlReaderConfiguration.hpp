@@ -44,8 +44,12 @@ public:
 
 protected:
 
-    static std::shared_ptr<configuration::ParticipantConfiguration>
-    participants_yaml_factory_(
+    template <YamlReaderVersion V = LATEST>
+    static configuration::DDSRouterConfiguration get_ddsrouter_configuration_(
+            const Yaml& yml);
+
+    template <YamlReaderVersion V = LATEST>
+    static std::shared_ptr<configuration::ParticipantConfiguration> participants_yaml_factory_(
             const Yaml& yml);
 };
 

@@ -58,6 +58,28 @@ Yaml YamlReader::get_value_in_tag(
     }
 }
 
+std::ostream& operator <<(
+        std::ostream& os,
+        const YamlReaderVersion& v)
+{
+    switch (v)
+    {
+    case LATEST:
+        os << "version{latest}";
+        break;
+
+    case V_0_1:
+        os << "version{v0.1}";
+        break;
+
+    default:
+        utils::tsnh(
+            utils::Formatter() << "Element out of enumeration in YamlReaderVersion.");
+    }
+
+    return os;
+}
+
 } /* namespace yaml */
 } /* namespace ddsrouter */
 } /* namespace eprosima */

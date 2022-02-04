@@ -32,13 +32,46 @@ namespace eprosima {
 namespace ddsrouter {
 namespace yaml {
 
-configuration::DDSRouterConfiguration
-YamlReaderConfiguration::get_ddsrouter_configuration(
+template <>
+std::shared_ptr<configuration::ParticipantConfiguration>YamlReaderConfiguration::participants_yaml_factory_<LATEST>(
+        const Yaml& yml)
+{
+    // Kind required
+    ParticipantKind kind = YamlReader::get<ParticipantKind>(yml, PARTICIPANT_KIND_TAG);
+
+    logInfo(DDSROUTER_YAML_CONFIGURATION, "Loading Participant of kind " << kind << ".");
+
+    switch (kind())
+    {
+        case ParticipantKind::VOID:
+        case ParticipantKind::ECHO:
+        case ParticipantKind::DUMMY:
+            return std::make_shared<configuration::ParticipantConfiguration>(
+                YamlReader::get<configuration::ParticipantConfiguration, LATEST>(yml));
+
+        case ParticipantKind::SIMPLE_RTPS:
+            return std::make_shared<configuration::SimpleParticipantConfiguration>(
+                YamlReader::get<configuration::SimpleParticipantConfiguration, LATEST>(yml));
+
+        case ParticipantKind::LOCAL_DISCOVERY_SERVER:
+        case ParticipantKind::WAN:
+            return std::make_shared<configuration::DiscoveryServerParticipantConfiguration>(
+                YamlReader::get<configuration::DiscoveryServerParticipantConfiguration, LATEST>(yml));
+
+        default:
+            throw ConfigurationException(
+                      utils::Formatter() << "Unkown or non valid Participant kind:" << kind << ".");
+            break;
+    }
+}
+
+template <>
+configuration::DDSRouterConfiguration YamlReaderConfiguration::get_ddsrouter_configuration_<LATEST>(
         const Yaml& yml)
 {
     try
     {
-        /////
+         /////
         // Get optional allowlist
         std::set<std::shared_ptr<FilterTopic>> allowlist;
         if (YamlReader::is_tag_present(yml, ALLOWLIST_TAG))
@@ -99,36 +132,43 @@ YamlReaderConfiguration::get_ddsrouter_configuration(
     }
 }
 
-std::shared_ptr<configuration::ParticipantConfiguration>
-YamlReaderConfiguration::participants_yaml_factory_(
+configuration::DDSRouterConfiguration
+YamlReaderConfiguration::get_ddsrouter_configuration(
         const Yaml& yml)
 {
-    // Kind required
-    ParticipantKind kind = YamlReader::get<ParticipantKind>(yml, PARTICIPANT_KIND_TAG);
-
-    logInfo(DDSROUTER_YAML_CONFIGURATION, "Loading Participant of kind " << kind << ".");
-
-    switch (kind())
+    // Get optional version or use latest instead
+    YamlReaderVersion configuration_version;
+    try
     {
-        case ParticipantKind::VOID:
-        case ParticipantKind::ECHO:
-        case ParticipantKind::DUMMY:
-            return std::make_shared<configuration::ParticipantConfiguration>(
-                YamlReader::get<configuration::ParticipantConfiguration>(yml));
+        if (YamlReader::is_tag_present(yml, YAML_VERSION_TAG))
+        {
+            // Always get version with YamlVersion LATEST (use by default)
+            configuration_version = get<YamlReaderVersion, LATEST>(yml, YAML_VERSION_TAG);
+        }
+        else
+        {
+            configuration_version = LATEST;
+        }
+    }
+    catch (const ConfigurationException& e)
+    {
+        throw ConfigurationException(
+                  utils::Formatter() << "Error getting configuration version:\n " << e.what());
+    }
 
-        case ParticipantKind::SIMPLE_RTPS:
-            return std::make_shared<configuration::SimpleParticipantConfiguration>(
-                YamlReader::get<configuration::SimpleParticipantConfiguration>(yml));
+    switch (configuration_version)
+    {
+    case LATEST:
+        logInfo(
+            DDSROUTER_YAML,
+            "Loading DDSRouter Configuration from configuration version: " << configuration_version << ".");
+        return get_ddsrouter_configuration_<LATEST>(yml);
+        break;
 
-        case ParticipantKind::LOCAL_DISCOVERY_SERVER:
-        case ParticipantKind::WAN:
-            return std::make_shared<configuration::DiscoveryServerParticipantConfiguration>(
-                YamlReader::get<configuration::DiscoveryServerParticipantConfiguration>(yml));
-
-        default:
-            throw ConfigurationException(
-                      utils::Formatter() << "Unkown or non valid Participant kind:" << kind << ".");
-            break;
+    default:
+        // return get_ddsrouter_configuration_<V_0_1>(yml);
+        throw ConfigurationException(
+            utils::Formatter() << "Configuration Version: " << configuration_version << " not supported.");
     }
 }
 

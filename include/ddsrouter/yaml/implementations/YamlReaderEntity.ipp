@@ -13,9 +13,12 @@
 // limitations under the License.
 
 /**
- * @file YamlReaderEntity.cpp
+ * @file YamlReaderEntity.ipp
  *
  */
+
+#ifndef _DDSROUTER_YAML_YAMLREADERENTITY_IPP_
+#define _DDSROUTER_YAML_YAMLREADERENTITY_IPP_
 
 #include <ddsrouter/security/tls/TlsConfiguration.hpp>
 #include <ddsrouter/security/tls/TlsConfigurationBoth.hpp>
@@ -414,3 +417,5 @@ std::shared_ptr<security::TlsConfiguration> YamlReader::get<std::shared_ptr<secu
 } /* namespace yaml */
 } /* namespace ddsrouter */
 } /* namespace eprosima */
+
+#endif /* _DDSROUTER_YAML_YAMLREADERENTITY_IPP_ */
