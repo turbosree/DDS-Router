@@ -142,7 +142,7 @@ void Track::data_available() noexcept
         // It does need to guard the mutex to avoid notifying Track thread while it is checking variable condition
         {
             // Set data available to true and notify transmit thread
-            std::lock_guard<std::mutex> lock(transmit_mutex_);
+            // std::lock_guard<std::mutex> lock(transmit_mutex_);
             is_data_available_.store(true);
         }
 
