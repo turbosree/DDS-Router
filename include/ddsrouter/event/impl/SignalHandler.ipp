@@ -21,7 +21,7 @@
 #define _DDSROUTER_EVENT_IMPL_SIGNALHANDLER_IPP_
 
 #include <algorithm>
-#include <csignal>
+#include <pthread.h>
 
 #include <ddsrouter/types/Log.hpp>
 #include <ddsrouter/event/SignalHandler.hpp>
@@ -35,6 +35,12 @@ std::vector<SignalHandler<SigNum>*> SignalHandler<SigNum>::active_handlers_;
 
 template <int SigNum>
 std::mutex SignalHandler<SigNum>::active_handlers_mutex_;
+
+template <int SigNum>
+pthread_t SignalHandler<SigNum>::signal_handler_thread_;
+
+template <int SigNum>
+std::atomic<bool> SignalHandler<SigNum>::signal_handler_active_(false);
 
 template <int SigNum>
 SignalHandler<SigNum>::SignalHandler() noexcept
@@ -132,11 +138,44 @@ void SignalHandler<SigNum>::signal_handler_routine_(
 }
 
 template <int SigNum>
+void* SignalHandler<SigNum>::signal_handler_thread_routine_(
+        void*) noexcept
+{
+    // Listen only for signal of interest
+    sigset_t set;
+    sigemptyset(&set);
+    sigaddset(&set, SigNum);
+
+    int sig;
+    signal_handler_active_.store(true);
+    while (true)
+    {
+        // Block thread until signal is received
+        sig = sigwaitinfo(&set, NULL);
+
+        if (!signal_handler_active_.load())
+        {
+            break;
+        }
+        else if (sig == SigNum)
+        {
+            signal_handler_routine_(SigNum);
+        }
+    }
+    return NULL;
+}
+
+template <int SigNum>
 void SignalHandler<SigNum>::set_signal_handler_() noexcept
 {
     logInfo(DDSROUTER_SIGNALHANDLER,
             "Set signal handler for signal " << SigNum << ".");
-    signal(SigNum, signal_handler_routine_);
+
+    if (pthread_create(&signal_handler_thread_, NULL, signal_handler_thread_routine_, NULL))
+    {
+        logError(DDSROUTER_SIGNALHANDLER,
+                "Error creating thread for handling signal " << SigNum << ".");
+    }
 }
 
 template <int SigNum>
@@ -144,7 +183,17 @@ void SignalHandler<SigNum>::unset_signal_handler_() noexcept
 {
     logInfo(DDSROUTER_SIGNALHANDLER,
             "Unset signal handler for signal " << SigNum << ".");
-    signal(SigNum, SIG_DFL);
+
+    signal_handler_active_.store(false);
+
+    // Send signal to listener thread so it wakes from wait state
+    pthread_kill(signal_handler_thread_, SigNum);
+
+    if (pthread_join(signal_handler_thread_, NULL))
+    {
+        logError(DDSROUTER_SIGNALHANDLER,
+                "Error joining thread for handling signal " << SigNum << ".");
+    }
 }
 
 } /* namespace event */
