@@ -75,7 +75,7 @@ TEST(YamlConfigurationDDSRouterTest, get_ddsrouter_configuration_ros_case)
 {
     const char* yml_str =
             R"(
-            builtin:
+            builtin-topics:
               - name: "rt/chatter"
                 type: "std_msgs::msg::dds_::String_"
             participants:
