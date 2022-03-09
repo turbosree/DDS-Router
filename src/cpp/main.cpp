@@ -17,8 +17,6 @@
  *
  */
 
-#include <csignal>
-
 #include <ddsrouter/core/DDSRouter.hpp>
 #include <ddsrouter/event/FileWatcherHandler.hpp>
 #include <ddsrouter/event/MultipleEventHandler.hpp>
