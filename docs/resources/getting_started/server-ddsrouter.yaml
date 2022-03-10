@@ -3,7 +3,6 @@
 allowlist:
   - name: Square
     type: ShapeType
-    keyed: true
 
 
 participants:
