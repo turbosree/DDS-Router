@@ -16,6 +16,7 @@
 # CMake build rules for DDS Router
 ###############################################################################
 cmake_minimum_required(VERSION 3.5)
+set(CMAKE_CXX_STANDARD 20)
 
 set(IS_TOP_LEVEL TRUE)
 if(PROJECT_SOURCE_DIR)
