@@ -1,0 +1,34 @@
+#########################
+# CHANGE DOMAIN EXAMPLE #
+#########################
+
+##################################
+# ALLOWED TOPICS
+# Shapes demo topics
+
+allowlist:
+  - name: "Square"
+    type: "ShapeType"
+    keyed: "true"
+  - name: "Triangle"
+    type: "ShapeType"
+    keyed: "true"
+  - name: "Circle"
+    type: "ShapeType"
+    keyed: "true"
+
+##################################
+# SIMPLE PARTICIPANT DOMAIN 0
+
+SimpleParticipant_domain0:                                                  
+  type: local                                                               
+  domain: 0                                                                 
+
+##################################
+# SIMPLE PARTICIPANT DOMAIN 1
+
+SimpleParticipant_domain1:                                                  
+  type: local                                                               
+  domain: 1                                                                 
+
+
