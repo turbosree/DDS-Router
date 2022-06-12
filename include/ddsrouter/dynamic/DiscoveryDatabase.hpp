@@ -22,6 +22,7 @@
 #include <map>
 #include <shared_mutex>
 #include <string>
+#include <mutex>
 
 #include <ddsrouter/types/endpoint/Endpoint.hpp>
 #include <ddsrouter/types/endpoint/Guid.hpp>
